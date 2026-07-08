@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>2026高考听力 · 新课标I卷 四维学习</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #f5f7fa;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            padding: 20px 16px 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 880px; width: 100%; }
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+            border-left: 6px solid #2563eb;
+            padding-left: 16px;
+        }
+        .subhead { color: #475569; margin-bottom: 28px; font-size: 0.95rem; padding-left: 22px; }
+        .card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+            margin-bottom: 28px;
+            padding: 20px 18px 18px;
+            border: 1px solid #eef2f6;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 14px;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background: white;
+            padding-bottom: 6px;
+        }
+        .text-label {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #0f172a;
+            background: #eef2ff;
+            padding: 4px 14px;
+            border-radius: 40px;
+            white-space: nowrap;
+        }
+        .audio-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1 1 auto;
+            min-width: 140px;
+        }
+        .play-btn {
+            background: #2563eb;
+            border: none;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 60px;
+            font-size: 1.4rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.15s;
+            flex-shrink: 0;
+            box-shadow: 0 4px 8px rgba(37,99,235,0.2);
+        }
+        .play-btn:hover { background: #1d4ed8; }
+        .play-btn.playing { background: #475569; }
+        .progress-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .time-display {
+            font-size: 0.73rem;
+            color: #64748b;
+            min-width: 36px;
+            font-variant-numeric: tabular-nums;
+        }
+        .slider {
+            flex: 1;
+            height: 4px;
+            background: #dee4ec;
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+        .slider-fill {
+            height: 100%;
+            width: 0%;
+            background: #2563eb;
+            border-radius: 10px;
+            transition: width 0.05s linear;
+        }
+        .tab-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+        .tab-btn {
+            background: white;
+            border: 1px solid #d1d9e6;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.83rem;
+            font-weight: 500;
+            color: #334155;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .tab-btn.active {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: white;
+        }
+        .tab-btn:hover:not(.active) { background: #f1f5f9; border-color: #94a3b8; }
+
+        .scroll-panel {
+            margin-top: 14px;
+            border-radius: 18px;
+            border: 1px solid #e9edf2;
+            overflow-y: auto;
+            background: #f8fafc;
+            padding: 16px 18px;
+            max-height: 400px;
+            min-height: 110px;
+            display: none;
+        }
+        .scroll-panel.show { display: block; }
+        .scroll-panel::-webkit-scrollbar { width: 5px; }
+        .scroll-panel::-webkit-scrollbar-track { background: #eef2f6; border-radius: 10px; }
+        .scroll-panel::-webkit-scrollbar-thumb { background: #b9c7da; border-radius: 10px; }
+
+        .panel-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #0f172a;
+            font-size: 1rem;
+            border-bottom: 1px dashed #dce2ec;
+            padding-bottom: 6px;
+            position: sticky;
+            top: 0;
+            background: #f8fafc;
+            z-index: 2;
+        }
+        .question-item { margin-bottom: 14px; }
+        .question-item strong { color: #0f172a; }
+        .option-list { list-style: none; padding-left: 6px; margin-top: 2px; }
+        .option-list li { margin-bottom: 3px; }
+
+        .original-text, .translation-text {
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: #ffffffd6;
+            padding: 10px 14px;
+            border-radius: 14px;
+            border-left: 4px solid #94a3b8;
+            line-height: 1.7;
+        }
+        .key-sentence {
+            font-weight: 700;
+            color: #b91c1c;
+            background: #fee2e2;
+            padding: 0 4px;
+            border-radius: 4px;
+        }
+        .q-marker {
+            font-weight: 700;
+            color: #b91c1c;
+            font-size: 0.68rem;
+            background: #fee2e2;
+            padding: 0 6px;
+            border-radius: 12px;
+            margin-left: 4px;
+            vertical-align: super;
+        }
+        .insight-box {
+            background: #ffffffd6;
+            padding: 10px 14px;
+            border-radius: 14px;
+            border-left: 4px solid #2563eb;
+            line-height: 1.7;
+        }
+        .insight-box ul { padding-left: 20px; margin-top: 4px; }
+        .insight-box li { margin-bottom: 6px; }
+        hr { margin: 14px 0; border: 0; border-top: 1px solid #e2e8f0; }
+
+        @media (max-width: 550px) {
+            .card { padding: 12px 8px; }
+            .tab-btn { padding: 5px 10px; font-size: 0.72rem; }
+            .play-btn { width: 38px; height: 38px; font-size: 1.1rem; }
+            .scroll-panel { max-height: 340px; padding: 12px 12px; }
+        }
+        .footer-note { text-align: center; color: #94a3b8; font-size: 0.8rem; margin-top: 10px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🎧 2026 新课标I卷 · 听力深度练</h1>
+    <div class="subhead">▶ 播放按钮始终可见 · 四维标签：题目·原文·翻译·命题洞察</div>
+    <div id="app"></div>
+    <div class="footer-note">📂 音频文件：Text 1.mp3 ~ Text 10.mp3 · 自动加载</div>
+</div>
+
+<script>
+    // ---------- 完整数据（含翻译、命题技巧）----------
+    const listeningData = [
+        { // Text 1
+            label: 'Text 1', audioSrc: 'Text 1.mp3',
+            questions: [{ q: '1. Who is the man?', options: ['A. A business client.', 'B. A job applicant.', 'C. A new staff member.'], answer: 'C' }],
+            rawOriginal: `M: Do I need a card to enter the building?\nW: Yes, you’ll get your card this afternoon. {{key:1}}Now let me show you around and say hello to everyone. And then we’ll talk about your job duties.{{/key:1}}`,
+            translation: `男：我需要门禁卡才能进楼吗？\n女：是的，你今天下午就能拿到卡。现在我带你四处转转，和大家打个招呼，然后我们谈谈你的工作职责。`,
+            insight: '【命题技巧】考查对话场景与人物身份推断。通过“show you around”“talk about your job duties”等入职引导语锁定“新员工”。\n【考察能力】获取具体信息+社会语境推断。'
+        },
+        { // Text 2
+            label: 'Text 2', audioSrc: 'Text 2.mp3',
+            questions: [{ q: '2. Where does the conversation probably take place?', options: ['A. In an office.', 'B. In a restaurant.', 'C. In a grocery store.'], answer: 'B' }],
+            rawOriginal: `W: Would you like some more roast beef? {{key:2}}It’s the chef’s signature dish.{{/key:2}}\nM: No thanks. It’s really good but I can’t manage anymore.`,
+            translation: `女：再来点烤牛肉吗？这是主厨的招牌菜。\n男：不用了，谢谢。味道很好，但我实在吃不下了。`,
+            insight: '【命题技巧】场景识别题。关键词“roast beef”“chef’s signature dish”“can’t manage anymore”指向餐厅。\n【考察能力】辨识地点场景词汇，排除干扰项（office/grocery）。'
+        },
+        { // Text 3
+            label: 'Text 3', audioSrc: 'Text 3.mp3',
+            questions: [{ q: '3. What are the speakers talking about?', options: ['A. A picture.', 'B. A fisherman.', 'C. A country.'], answer: 'A' }],
+            rawOriginal: `W: Hey, look at this one in the newspaper {{key:3}}"Fishermen Fishing in Lake Victoria in Tanzania".{{/key:3}}\nM: Wow, that’s awesome. I like the unique atmosphere caught by the photographer.`,
+            translation: `女：嘿，看报纸上这张《坦桑尼亚维多利亚湖上的渔民》。\n男：哇，太棒了。我喜欢摄影师捕捉到的独特氛围。`,
+            insight: '【命题技巧】主旨题。双方围绕报纸上的一张照片展开评论，“photographer”明确提示是图片。\n【考察能力】抓取话题核心词，区分主体与背景信息。'
+        },
+        { // Text 4
+            label: 'Text 4', audioSrc: 'Text 4.mp3',
+            questions: [{ q: '4. What does the woman suggest Max do?', options: ['A. Go to bed.', 'B. Drive carefully.', 'C. Update his blog.'], answer: 'A' }],
+            rawOriginal: `W: {{key:4}}It’s almost midnight, Max. You’ve got a long drive tomorrow.{{/key:4}}\nM: Okay, another 15 minutes for my travel blog and I’ll be done.`,
+            translation: `女：快半夜了，Max。你明天还要开长途车呢。\n男：好吧，我再花15分钟写旅行博客就结束。`,
+            insight: '【命题技巧】建议题。女士通过陈述事实“快半夜+明天长途驾驶”间接建议睡觉。\n【考察能力】理解隐含建议，区分直接建议与间接提醒。'
+        },
+        { // Text 5
+            label: 'Text 5', audioSrc: 'Text 5.mp3',
+            questions: [{ q: '5. Why does Sarah make the phone call?', options: ['A. To request sick leave.', 'B. To make a complaint.', 'C. To postpone a meeting.'], answer: 'C' }],
+            rawOriginal: `W: Hello, Mr. Waterman, this is Sarah Jones. I’m stuck on the highway. There’s a serious accident. I’m afraid I can’t arrive before noon. {{key:5}}Could we meet this afternoon?{{/key:5}}\nM: Okay, I’ll see my doctor at one and will be available after two.`,
+            translation: `女：您好，Waterman先生，我是Sarah Jones。我在高速上堵住了，发生了严重事故。恐怕中午前赶不到。我们能改成下午见面吗？\n男：好的，我一点要看医生，两点以后有空。`,
+            insight: '【命题技巧】电话目的题。核心请求“Could we meet this afternoon?”表推迟会议。\n【考察能力】辨别沟通目的，区分请假/投诉/改约。'
+        },
+        { // Text 6
+            label: 'Text 6', audioSrc: 'Text 6.mp3',
+            questions: [
+                { q: '6. What makes Copenhagen different from London in Lisa’s eyes?', options: ['A. A less stressful life.', 'B. Better city planning.', 'C. More tourist sites.'], answer: 'A' },
+                { q: '7. Why did Lisa originally come to Copenhagen?', options: ['A. To look for a permanent job.', 'B. To do a short-term project.', 'C. To visit a famous museum.'], answer: 'B' }
+            ],
+            rawOriginal: `M: Lisa, you’re English, but you live here. What do you love about Copenhagen?\nW: It has everything big cities offer — cafés, theaters, museums — but it is still relaxing and manageable. {{key:6}}Unlike London, you don’t feel constant pressure here.{{/key:6}}\nM: Was this lifestyle why you first came?\nW: No, {{key:7}}I originally came for a three-month project at a law firm.{{/key:7}} After finishing it, they offered me a permanent job. I took it and stayed.`,
+            translation: `男：Lisa，你是英国人但住在这里。你喜欢哥本哈根的什么？\n女：大城市有的它都有——咖啡馆、剧院、博物馆——但它仍然让人放松、易于生活。不像伦敦，在这里你不会感到持续的压力。\n男：你最初就是因为这种生活方式来的吗？\n女：不是，我最初是因为一家律所的三个月项目来的。项目结束后他们给了我一份长期工作，我接受了就留下来了。`,
+            insight: '【命题技巧】6题：对比题，抓住“Unlike London, you don’t feel constant pressure”；7题：细节题，注意“originally came for a three-month project”。\n【考察能力】比较分析+区分最初目的与后续发展。'
+        },
+        { // Text 7
+            label: 'Text 7', audioSrc: 'Text 7.mp3',
+            questions: [
+                { q: '8. What is the total budget for the dinner?', options: ['A. £200.', 'B. £300.', 'C. £600.'], answer: 'C' },
+                { q: '9. What occasion is the dinner for?', options: ['A. The retirement of an employee.', 'B. The launch of a new product.', 'C. The opening of a branch office.'], answer: 'A' },
+                { q: '10. What is the woman going to do for Mr. Lee?', options: ['A. Take his order.', 'B. Bring him the bill.', 'C. Email him a menu.'], answer: 'C' }
+            ],
+            rawOriginal: `W: Garden Hotel. May I help you?\nM: Hello, this is Mike Lee from Gilbert Company. We’d like to book a dinner for next Tuesday.\nW: Certainly, Mr. Lee. Could you let me know how many guests you’re expecting and if you have a specific budget in mind?\nM: Yes, {{key:8}}we’re expecting 20 people and we’re aiming for 30 pounds per person.{{/key:8}}\nW: Understood. Is this for a special occasion?\nM: Yes, {{key:9}}it’s to honor a staff member who is retiring next month.{{/key:9}}\nW: That sounds lovely. What time would you like the dinner to start?\nM: At 6:30 p.m.\nW: OK. Would you like a detailed menu with prices?\nM: Yes. {{key:10}}Could you email it to Mike Lee@Gilbert.com?{{/key:10}}\nW: No problem. I’m on it.`,
+            translation: `女：花园酒店，请问有什么可以帮您？\n男：你好，我是Gilbert公司的Mike Lee。我们想预订下周二的一场晚宴。\n女：好的，李先生。请问您预计多少位客人？预算大概是多少？\n男：20人，每人30英镑。\n女：明白了。是特别场合吗？\n男：是的，为了欢送一位下个月退休的员工。\n女：真好。您希望几点开始？\n男：下午6:30。\n女：好的。您需要一份带价格的详细菜单吗？\n男：是的，请发到Mike Lee@Gilbert.com。\n女：没问题，马上办。`,
+            insight: '【命题技巧】8题：简单计算（20×30=600）；9题：细节题“retiring next month”；10题：行动题“email it to…”。\n【考察能力】数字运算+关键信息筛选+后续行动预判。'
+        },
+        { // Text 8
+            label: 'Text 8', audioSrc: 'Text 8.mp3',
+            questions: [
+                { q: '11. What does Jenny do?', options: ['A. She’s an AI engineer.', 'B. She’s a pop singer.', 'C. She’s a radio host.'], answer: 'B' },
+                { q: '12. How does the woman feel about what Jenny has done?', options: ['A. It might cause legal problems.', 'B. It would benefit the community.', 'C. It could be a profitable business.'], answer: 'C' },
+                { q: '13. What will the man do next?', options: ['A. Play a song.', 'B. Contact a listener.', 'C. Recommend a show.'], answer: 'A' }
+            ],
+            rawOriginal: `W: Dear listeners, the song we’ve just heard was made with an AI version of Jenny’s singing voice.\nM: Yeah, earlier this year Jenny announced that she’d let anybody make a song using her AI voice, as long as they were entitled and shared their profits with her. And in just a few weeks, more than 300 new songs were created using her AI voice.\nW: Incredible. Just imagine — Jenny may have been at home drinking a glass of wine while her AI-cloned voice worked hard to sing her songs. {{key:12}}This could be an attractive new business model for a pop star.{{/key:12}}\nM: Indeed, but some of our listeners called to say they want to hear Jenny’s real voice. {{key:13}}Now let’s play one of her greatest hits, Show Me Your Love.{{/key:13}}`,
+            translation: `女：各位听众，刚才听到的这首歌是用Jenny歌声的AI版本制作的。\n男：是的，今年早些时候Jenny宣布她允许任何人用她的AI声音制作歌曲，只要注明出处并分享利润。短短几周内，就有300多首新歌用她的AI声音创作出来。\n女：难以置信。想象一下——Jenny可能在家喝着红酒，而她的AI克隆声音却在努力唱歌。这对流行歌手来说可能是一个有吸引力的新商业模式。\n男：确实，但有些听众来电说他们想听Jenny真实的声音。现在我们来播放她的一首热门歌曲《Show Me Your Love》。`,
+            insight: '【命题技巧】11题：职业推断（pop singer由“new business model for a pop star”推出）；12题：态度题“attractive new business model”；13题：行动预测“let’s play one of her greatest hits”。\n【考察能力】人物身份推断+评价态度+后续行为预测。'
+        },
+        { // Text 9
+            label: 'Text 9', audioSrc: 'Text 9.mp3',
+            questions: [
+                { q: '14. What does Evans say about ancient Babylonia?', options: ['A. It is rich in energy resources.', 'B. It is home to several languages.', 'C. It is the birthplace of many foods.'], answer: 'C' },
+                { q: '15. What did people initially think the ancient texts were about?', options: ['A. Cookery.', 'B. Medicine.', 'C. Education.'], answer: 'B' },
+                { q: '16. What do we know about the French author Jean Bottéro?', options: ['A. He proved Mary Hussey right.', 'B. He taught history at Yale University.', 'C. He was the first to translate the texts.'], answer: 'A' }
+            ],
+            rawOriginal: `M: Dr. Evans, you just said that these ancient texts are actually the recipes from Ancient Babylonia. Can you tell us more?\nW: {{key:14}}Ancient Babylonia is home to many of the things that we use in our cooking today.{{/key:14}} I bet about 50% of the energy you need every day comes from vegetables or animals that originated in this area.\nM: Why have these texts taken so long to come to light?\nW: These ancient texts have been known since the 1920s but {{key:15}}were thought to be medical texts.{{/key:15}} In the 1940s, Mary Hussey, an American scholar, suggested that they might be about food. But people didn’t believe her until French author Jean Bottéro in the 1980s was asked to write an article about cooking in the past. He had heard about the texts, so he went to Yale University and {{key:16}}found out that they were indeed about food.{{/key:16}}`,
+            translation: `男：Evans博士，您刚才说这些古代文献实际上是古巴比伦的食谱。能详细讲讲吗？\n女：古巴比伦是我们今天烹饪中使用的许多东西的发源地。我敢说你每天所需能量的一半来自原产于该地区的蔬菜或动物。\n男：为什么这些文献花了这么久才被揭示？\n女：这些古代文献自20世纪20年代就为人所知，但被认为是医学文献。20世纪40年代，美国学者Mary Hussey提出它们可能与食物有关。但人们不相信她，直到20世纪80年代法国作家Jean Bottéro受邀撰写一篇关于古代烹饪的文章。他听说过这些文献，于是去了耶鲁大学，发现它们确实是关于食物的。`,
+            insight: '【命题技巧】14题：细节定位“home to many things we use in cooking”；15题：初始观点“thought to be medical texts”；16题：人物贡献“found out they were indeed about food”证实前人。\n【考察能力】学术听力中的观点演变追踪+人物贡献辨析。'
+        },
+        { // Text 10
+            label: 'Text 10', audioSrc: 'Text 10.mp3',
+            questions: [
+                { q: '17. What must the students wear when doing the experiment?', options: ['A. Protective glasses.', 'B. Loose clothes.', 'C. Waterproof caps.'], answer: 'A' },
+                { q: '18. What should the students do if they knock over a chemical container?', options: ['A. Report to the teacher.', 'B. Clear up the mess.', 'C. Check the instructions.'], answer: 'A' },
+                { q: '19. Why should the students switch roles?', options: ['A. To speed up the experiment.', 'B. To double-check the final results.', 'C. To get an equal chance to practice.'], answer: 'C' },
+                { q: '20. What should the students do if they finish early?', options: ['A. Analyze the data.', 'B. Clean their workspace.', 'C. Start a new experiment.'], answer: 'B' }
+            ],
+            rawOriginal: `Before we begin today’s experiment, let’s review the lab rules. First, {{key:17}}safety glasses must be worn at all times, even if you’re only watching.{{/key:17}} Second, never mix chemicals unless the instructions tell you to do so. Today we’re using a strong acid which can cause serious burns if it touches your skin. If any chemical container is knocked over, don’t panic. {{key:18}}Tell me immediately and I’ll handle the cleanup.{{/key:18}} Also, keep your hair tied back and avoid wearing loose clothes. We will work in pairs. One person will handle the tools while the other records the data. {{key:19}}Switch roles after every three trials to ensure everyone gets practice.{{/key:19}} Remember, the goal is accurate data, not speed. If you finish early, do not start a new experiment. Instead, {{key:20}}clean your workspace thoroughly.{{/key:20}} Any questions? No? All right, let’s have a safe and productive class.`,
+            translation: `在我们开始今天的实验之前，先回顾一下实验室规则。第一，必须始终佩戴安全眼镜，即使你只是旁观。第二，除非说明书指示，否则切勿混合化学品。今天我们使用的是强酸，接触皮肤会导致严重灼伤。如果有化学品容器被打翻，不要慌张。立刻告诉我，我来处理清理工作。另外，请把头发扎起来，避免穿宽松的衣服。我们将两人一组合作。一人操作工具，另一人记录数据。每三次试验后交换角色，以确保每个人都有机会练习。记住，目标是准确的数据，不是速度。如果提前完成，不要开始新的实验，而是彻底清洁你的工作区。有问题吗？没有？好，让我们开始一堂安全而高效的课。`,
+            insight: '【命题技巧】17题：规则细节“safety glasses”；18题：应急程序“Tell me immediately”；19题：目的说明“ensure everyone gets practice”；20题：完成后续“clean your workspace”。\n【考察能力】听取指令+安全规程理解+多步骤信息筛选。'
+        }
+    ];
+
+    // 高亮函数
+    function renderKeySentences(raw) {
+        return raw.replace(/\{\{key:(\d+)\}\}([\s\S]*?)\{\{\/key:\1\}\}/g, (match, num, content) => {
+            return `<span class="key-sentence">${content}</span><sup class="q-marker">第${num}题</sup>`;
+        });
+    }
+
+    // 渲染所有卡片
+    const app = document.getElementById('app');
+    listeningData.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        // ---- Header ----
+        const header = document.createElement('div');
+        header.className = 'card-header';
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'text-label';
+        labelSpan.textContent = item.label;
+        const audioRow = document.createElement('div');
+        audioRow.className = 'audio-row';
+        const btn = document.createElement('button');
+        btn.className = 'play-btn';
+        btn.innerHTML = '▶';
+        const progressArea = document.createElement('div');
+        progressArea.className = 'progress-area';
+        const curTime = document.createElement('span');
+        curTime.className = 'time-display'; curTime.textContent = '0:00';
+        const slider = document.createElement('div');
+        slider.className = 'slider';
+        const fill = document.createElement('div');
+        fill.className = 'slider-fill';
+        slider.appendChild(fill);
+        const durTime = document.createElement('span');
+        durTime.className = 'time-display'; durTime.textContent = '0:00';
+        progressArea.append(curTime, slider, durTime);
+        audioRow.append(btn, progressArea);
+        header.append(labelSpan, audioRow);
+
+        // ---- 四个标签 ----
+        const tabGroup = document.createElement('div');
+        tabGroup.className = 'tab-group';
+        const tabs = [
+            { key: 'q', label: '📋 题目' },
+            { key: 'o', label: '📜 原文' },
+            { key: 't', label: '🌐 翻译' },
+            { key: 'i', label: '🧠 命题技巧' }
+        ];
+        const tabBtns = {};
+        tabs.forEach((t, i) => {
+            const btnTab = document.createElement('button');
+            btnTab.className = 'tab-btn' + (i === 0 ? ' active' : '');
+            btnTab.textContent = t.label;
+            btnTab.dataset.tab = t.key;
+            tabGroup.appendChild(btnTab);
+            tabBtns[t.key] = btnTab;
+        });
+
+        // ---- 四个面板 ----
+        // 题目面板
+        const panelQ = document.createElement('div');
+        panelQ.className = 'scroll-panel show';
+        const qTitle = document.createElement('div');
+        qTitle.className = 'panel-title'; qTitle.textContent = '✏️ 题目与选项';
+        panelQ.appendChild(qTitle);
+        item.questions.forEach(q => {
+            const div = document.createElement('div');
+            div.className = 'question-item';
+            const strong = document.createElement('strong');
+            strong.textContent = q.q;
+            div.appendChild(strong);
+            const ul = document.createElement('ul');
+            ul.className = 'option-list';
+            q.options.forEach(opt => {
+                const li = document.createElement('li');
+                li.textContent = opt;
+                ul.appendChild(li);
+            });
+            div.appendChild(ul);
+            panelQ.appendChild(div);
+        });
+
+        // 原文面板
+        const panelO = document.createElement('div');
+        panelO.className = 'scroll-panel';
+        const oTitle = document.createElement('div');
+        oTitle.className = 'panel-title'; oTitle.textContent = '🔊 听力原文 · 红字为证据句';
+        panelO.appendChild(oTitle);
+        const origDiv = document.createElement('div');
+        origDiv.className = 'original-text';
+        origDiv.innerHTML = renderKeySentences(item.rawOriginal);
+        panelO.appendChild(origDiv);
+
+        // 翻译面板
+        const panelT = document.createElement('div');
+        panelT.className = 'scroll-panel';
+        const tTitle = document.createElement('div');
+        tTitle.className = 'panel-title'; tTitle.textContent = '🌐 中文翻译';
+        panelT.appendChild(tTitle);
+        const transDiv = document.createElement('div');
+        transDiv.className = 'translation-text';
+        transDiv.textContent = item.translation;
+        panelT.appendChild(transDiv);
+
+        // 命题技巧面板
+        const panelI = document.createElement('div');
+        panelI.className = 'scroll-panel';
+        const iTitle = document.createElement('div');
+        iTitle.className = 'panel-title'; iTitle.textContent = '🧠 命题技巧 & 高阶思维';
+        panelI.appendChild(iTitle);
+        const insightDiv = document.createElement('div');
+        insightDiv.className = 'insight-box';
+        // 支持换行
+        insightDiv.innerHTML = item.insight.replace(/\n/g, '<br>');
+        panelI.appendChild(insightDiv);
+
+        card.append(header, tabGroup, panelQ, panelO, panelT, panelI);
+        app.appendChild(card);
+
+        // ---- Tab切换逻辑 ----
+        const panels = { q: panelQ, o: panelO, t: panelT, i: panelI };
+        Object.keys(tabBtns).forEach(key => {
+            tabBtns[key].addEventListener('click', () => {
+                Object.values(tabBtns).forEach(b => b.classList.remove('active'));
+                tabBtns[key].classList.add('active');
+                Object.values(panels).forEach(p => p.classList.remove('show'));
+                panels[key].classList.add('show');
+            });
+        });
+
+        // ---- 音频控制 ----
+        const audio = new Audio(item.audioSrc);
+        audio.preload = 'auto';
+        let playing = false;
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!playing) {
+                document.querySelectorAll('.play-btn.playing').forEach(b => { if (b !== btn) b.click(); });
+                audio.play().then(() => {
+                    playing = true; btn.classList.add('playing'); btn.innerHTML = '⏸';
+                }).catch(() => alert(`无法播放 ${item.audioSrc}`));
+            } else {
+                audio.pause(); playing = false; btn.classList.remove('playing'); btn.innerHTML = '▶';
+            }
+        });
+        audio.addEventListener('ended', () => {
+            playing = false; btn.classList.remove('playing'); btn.innerHTML = '▶';
+            fill.style.width = '0%'; curTime.textContent = '0:00';
+        });
+        audio.addEventListener('timeupdate', () => {
+            if (audio.duration) {
+                const pct = (audio.currentTime / audio.duration) * 100;
+                fill.style.width = pct + '%';
+                curTime.textContent = formatTime(audio.currentTime);
+                durTime.textContent = formatTime(audio.duration);
+            }
+        });
+        audio.addEventListener('loadedmetadata', () => {
+            durTime.textContent = formatTime(audio.duration);
+        });
+        slider.addEventListener('click', (e) => {
+            const rect = slider.getBoundingClientRect();
+            const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+            if (audio.duration) audio.currentTime = ratio * audio.duration;
+        });
+        function formatTime(sec) {
+            if (isNaN(sec) || !isFinite(sec)) return '0:00';
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return `${m}:${s.toString().padStart(2, '0')}`;
+        }
+    });
+</script>
+</body>
+</html>
